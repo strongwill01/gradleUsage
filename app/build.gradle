@@ -16,7 +16,7 @@ android {
         versionName vName
 
         manifestPlaceholders = [
-                APP_ICON: "@mipmap/ic_launcher_temp"
+                APP_ICON: "@mipmap/ic_launcher"
         ]
 
         //微信
