@@ -1,4 +1,4 @@
-![](logo/ic_launcher-32x32.png)
+<img src="logo/ic_launcher-512x512.png" width="123" height="123">
 
 ### Prepare before you start
 1、在app/下新建文件`local.properties`, 填入如下内容(修改等号后边的值即可):
