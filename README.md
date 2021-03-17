@@ -1,4 +1,4 @@
-![](/Users/lyl/techWorks/demos/gradleUsage/logo/ic_launcher-32x32.png)
+![](logo/ic_launcher-32x32.png)
 
 ### Prepare before you start
 1、在app/下新建文件`local.properties`, 填入如下内容(修改等号后边的值即可):
