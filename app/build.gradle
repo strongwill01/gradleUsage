@@ -1,0 +1,232 @@
+apply plugin: 'com.android.application'
+
+
+def vCode = getVersionCode()
+def vName = getVersionName() + getVersionTime()// "1.0.0"
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        applicationId "cn.edu.gradleusage" // .demo
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode vCode
+        versionName vName
+
+        manifestPlaceholders = [
+                APP_ICON: "@mipmap/ic_launcher_temp"
+        ]
+
+        //微信
+//        buildConfigField("String", "WX_APP_ID", "\"******\"")
+
+        ndk {
+            moduleName "native"
+            abiFilters "armeabi-v7a"
+        }
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    //获取local.properties的内容/app/
+    Properties properties = new Properties()
+    properties.load(project.file('./local.properties').newDataInputStream())
+
+    signingConfigs {
+        release {
+            logger.error('release keystore info:'
+                    + properties.getProperty("keystore_storeFile")
+                    + " , "
+                    + properties.getProperty("keystore_storePassword"))
+
+            storeFile file(properties.getProperty("keystore_storeFile"))
+//            properties.load(new FileInputStream(properties.getProperty("keystore_storeFile")))// todo?
+            storePassword properties.getProperty("keystore_storePassword")
+            keyAlias properties.getProperty("keystore_keyAlias")
+            keyPassword properties.getProperty("keystore_keyPassword")
+
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        debug {
+            // 显示Log
+            //buildConfigField "boolean", "LOG_DEBUG", "true"
+
+            versionNameSuffix "-debug"
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            debuggable true
+
+            signingConfig signingConfigs.release
+        }
+
+        release {
+            zipAlignEnabled true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            signingConfig signingConfigs.release
+        }
+
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                def outputFile = output.outputFile
+                def fileName
+                if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                    logger.error('\r\n==================================')
+                    logger.error('ENV:' + variant.productFlavors[0].name)
+                    if (variant.productFlavors[0].name.contains("***")) {
+                        logger.error('oo:\r\n' + variant.buildType.name)
+                        if (variant.buildType.name.contains('release')) {
+                            fileName = "oo" + "_v${vName}_${releaseTime()}_${variant.productFlavors[0].name}release.apk"
+                        } else if (variant.buildType.name.contains('debug')) {
+                            fileName = "oo" + "_v${vName}_${releaseTime()}_${variant.productFlavors[0].name}debug.apk"
+                        }
+                    } else {
+                        logger.error('onlyonce:\r\n' + variant.buildType.name)
+                        if (variant.buildType.name.contains('release')) {
+                            fileName = "onlyonce_v${vName}_${releaseTime()}_${variant.productFlavors[0].name}release.apk"
+                        } else if (variant.buildType.name.contains('debug')) {
+                            fileName = "onlyonce_v${vName}_${releaseTime()}_${variant.productFlavors[0].name}debug.apk"
+                        }
+                    }
+
+                    logger.error('pkg name:' + outputFile.parent + File.separator + fileName.toString())
+                    outputFileName = new File(fileName)
+                }
+            }
+        }
+    }
+
+    flavorDimensions "default"
+    productFlavors {
+        oo_test_ {
+            manifestPlaceholders = [U_CHANNEL    : "onlyonce-test",
+                                    SECURITY_FILE: "@xml/network_security_config_qa"
+            ]
+            resValue "string", "app_name", "onlyonce-t"
+            buildConfigField "String", "BUILD_FLAVOR", "\"test\""
+        }
+
+        oo_qa_prod_ {
+            manifestPlaceholders = [U_CHANNEL    : "onlyonce-qa_prod",
+                                    SECURITY_FILE: "@xml/network_security_config_qa"
+            ]
+            resValue "string", "app_name", "onlyonce"
+            buildConfigField "String", "BUILD_FLAVOR", "\"qa_prod\""
+        }
+
+        oo_prod_ {
+            manifestPlaceholders = [U_CHANNEL    : "onlyonce-prod",
+                                    SECURITY_FILE: "@xml/network_security_config"
+            ]
+            resValue "string", "app_name", "onlyonce"
+            buildConfigField "String", "BUILD_FLAVOR", "\"prod\""
+        }
+
+    }
+
+    dependencies {
+        implementation fileTree(dir: "libs", include: ["*.jar"])
+        implementation 'androidx.appcompat:appcompat:1.2.0'
+        implementation 'com.google.android.material:material:1.2.1'
+        implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+        implementation 'androidx.navigation:navigation-fragment:2.3.1'
+        implementation 'androidx.navigation:navigation-ui:2.3.1'
+        implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+        testImplementation 'junit:junit:4.12'
+        androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    }
+
+}
+
+/**
+ * 获取当前时间
+ *
+ * @return
+ */
+def releaseTime() {
+    return new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+08:00"))
+}
+
+/**
+ * 获取当前应用版本号(这个由于业务原因在文件`version.properties`手动修改即可)
+ *
+ * @return
+ */
+def getVersionName() {
+    def versionFile = file('version.properties')
+    if (!versionFile.canRead()) {
+        throw new GradleException("Could not find `version.properties`!")
+    }
+
+    Properties versionProps = new Properties()
+    versionProps.load(new FileInputStream(versionFile))
+    logger.log(LogLevel.INFO, "VERSION_NAME=" + versionProps['VERSION_NAME'])
+    return versionProps['VERSION_NAME']
+
+}
+
+/**
+ * 获取当前应用版本号(release下自增，也手动修改即可)
+ *
+ * @return
+ */
+def getVersionCode() {
+    def versionFile = file('version.properties')
+    if (!versionFile.canRead()) {
+        throw new GradleException("Could not find `version.properties`!")
+    }
+
+    Properties versionProps = new Properties()
+    versionProps.load(new FileInputStream(versionFile))
+
+    Integer versionCode = versionProps['VERSION_CODE'].toInteger()
+
+    def runTasks = gradle.startParameter.taskNames
+    if ('assembleRelease' in runTasks) {
+        // 仅在assembleRelease任务时在版本号自增
+        versionProps['VERSION_CODE'] = Integer.toString(++versionCode)
+        versionProps.store(versionFile.newWriter(), null)
+    }
+    logger.log(LogLevel.INFO, "VERSION_CODE=" + versionCode)
+
+    return versionCode
+
+}
+
+/**
+ * 获得版本生成的时间(追加在版本号之后，只有在release下生效)
+ *
+ * @return
+ */
+def getVersionTime() {
+    def versionFile = file('version.properties')
+    if (!versionFile.canRead()) {
+        throw new GradleException("Could not find `version.properties`!")
+    }
+
+    Properties versionProps = new Properties()
+    versionProps.load(new FileInputStream(versionFile))
+    def runTasks = gradle.startParameter.taskNames
+    if ('assembleRelease' in runTasks) {
+        // 仅在assembleRelease任务时在版本号后追加.时间
+        def versionTime = releaseTime()
+        versionProps.setProperty("VERSION_TIME", versionTime)
+        versionProps.store(versionFile.newWriter(), null)
+
+        logger.log(LogLevel.INFO, "VERSION_TIME?=" + versionProps['VERSION_TIME'])
+    } else {
+        return "";
+    }
+
+    return "." + versionProps['VERSION_TIME']
+}
