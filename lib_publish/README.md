@@ -1,4 +1,5 @@
 
+<img src="imgs/logo_512.png" width="123" height="123">
 
 ### 1、发布到仓库配置
 
