@@ -27,3 +27,11 @@ Groovy的[官方网站](http://www.groovy-lang.org/)是http://www.groovy-lang.or
 
 [publish](lib_publish/README.md)
 
+
+### 修改默认显示语言
+1、在工程目录下新建文件`.gitattributes`
+2、填写指定显示语言，内容如下供参考，注意不能有多余空格。
+```
+*.gradle linguist-language=groovy
+*.java linguist-language=java
+```
