@@ -12,9 +12,7 @@ ext {
 //    PUBLISH_VERSION = '1.0.1-SNAPSHOT'  // 测试时添加-SNAPSHOT
 }
 
-android {
-    ...... // 此处省略
-}
+android { ... }
 
 // 是否发到本地maven(测试用)
 def publishLocal = false
@@ -56,3 +54,13 @@ uploadArchives {
 
 ### 3、run uploadArchives task
 <img src="imgs/100-run-task.png" width="300" height="300">
+
+### 4、add dependencies
+```xml
+	implementation 'cn.edu.lib:publish:1.0.2'
+```
+
+### 5、invoke
+```android
+	TestLib.getMessage(1);
+```

@@ -20,3 +20,10 @@ Groovy的[官方网站](http://www.groovy-lang.org/)是http://www.groovy-lang.or
 
 ### gradle usage
 
+#### 1、自动修改版本号
+[versionName](app/README.md)
+
+#### 2、仓库发布
+
+[publish](lib_publish/README.md)
+
