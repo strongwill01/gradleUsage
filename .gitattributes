@@ -1,2 +1,2 @@
-*.gradle-language=groovy
-*.java-language=java
+*.gradle linguist-language=groovy
+*.java linguist-language=java
