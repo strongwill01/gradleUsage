@@ -131,7 +131,7 @@ applicationVariants.all { variant ->
 }
 ```
 
-具体内容详见[build.gradle](app/build.gradle)
+具体内容详见[build.gradle](build.gradle)
 
 
 
