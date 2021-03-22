@@ -139,7 +139,7 @@ applicationVariants.all { variant ->
 那么至少需要安装2个，分别是测试环境和生产环境两个应用包体。
 
 有两种方式去进行修改，但都使用的是`applicationIdSuffix`进行操作，就是修改应用唯一标识(项目构建时，会将application ID赋值给mainifest中的package属性，可以解压apk进行查看)。
-1、buildTypes方式
+* 1、buildTypes方式
 
 ```xml
 debug {
@@ -149,7 +149,7 @@ debug {
 }
 ```
 
-2、Flavors方式
+* 2、Flavors方式
 因为项目中使用的是test、qa、prod进行区分，所以采用该种方式
 ```xml
 productFlavors {
@@ -168,6 +168,7 @@ productFlavors {
 ```
 
 安装后效果如下：
+
 <img src="./imgs/more_apk.png" />
 
 
