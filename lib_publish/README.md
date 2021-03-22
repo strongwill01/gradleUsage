@@ -61,7 +61,7 @@ uploadArchives {
 	implementation 'cn.edu.lib:publish:1.0.2'
 ```
 
-### 5、invoke
+### 5、test invoke
 ```android
 	TestLib.getMessage(1);
 ```
