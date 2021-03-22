@@ -19,14 +19,16 @@ Groovy是一种基于Java平台的面向对象语言。 Groovy 1.0于2007年1月
 Groovy的[官方网站](http://www.groovy-lang.org/)是http://www.groovy-lang.org/
 
 ### gradle usage
-
 #### 1、自动修改版本号
-[versionName](app/README.md)
+[versionName](app/README.md#1版本号自增)
+
 
 #### 2、仓库发布
-
 [publish](lib_publish/README.md)
 
+
+#### 3、同一个app安装多个在一部设备上
+[applicationId](app/README.md#2同一个app安装多个在一部设备上)
 
 ### 修改默认显示语言
 1、在工程目录下新建文件`.gitattributes`  
