@@ -1,11 +1,11 @@
-### 版本号自增
+### 1、版本号自增
 每次发布时，版本号自增加。但这样其实不能满足业务场景，对于当前我所涉及的产品来讲，是自增`versionCode`，而`versionName`是根据业务需求人为指定的。
 
 当发布时获取当前配置的版本号追加当前时间作为新的版本号名称，明确知道打包的时间，便于后期的使用和查找等。
 
 * 1、新建version.properties文件
 内容如下：
-```
+```xml
   #Wed Mar 17 16:37:16 CST 2021
   VERSION_NAME=1.0.0
   VERSION_CODE=2
@@ -13,7 +13,7 @@
 ```
 
 * 2、获取版本号、版本名称、当前时间
-```
+```xml
 def vCode = getVersionCode()
 def vName = getVersionName() + getVersionTime()// "1.0.0"
 
@@ -105,7 +105,7 @@ def getVersionTime() {
 ```
 
 * 4、打包修改apk名称
-```
+```xml
 buildType{
 ...
 
@@ -132,6 +132,47 @@ applicationVariants.all { variant ->
 ```
 
 具体内容详见[build.gradle](build.gradle)
+
+### 2、同一个app安装多个在一部设备上
+通常在开发时由于各种各样的研发和测试需求，同一个app需要安装多个在同一个设备上。比如访问服务基本分为测试环境、预发环境和生产环境，在使用中如果能安装多个则操作起来比较方便(当然也可以做个切换环境的功能来支持，但建议只在测试环境中进行)。
+目前项目中用到的方案是，测试包可以进行切换不同的域名进行访问，正式环境不支持任何切换，做到生产包就是上线后用户使用的版本，不插入任何可能变化的逻辑代码。
+那么至少需要安装2个，分别是测试环境和生产环境两个应用包体。
+
+有两种方式去进行修改，但都使用的是`applicationIdSuffix`进行操作，就是修改应用唯一标识(项目构建时，会将application ID赋值给mainifest中的package属性，可以解压apk进行查看)。
+1、buildTypes方式
+
+```xml
+debug {
+    ...
+    versionNameSuffix "-t" // 在版本号后加标识test
+    applicationIdSuffix ".test" // 增加该行代码则将报名修改为 [your packageName].test
+}
+```
+
+2、Flavors方式
+因为项目中使用的是test、qa、prod进行区分，所以采用该种方式
+```xml
+productFlavors {
+        oo_test_ {
+            ...
+            resValue "string", "app_name", "onlyonce-t"
+            applicationIdSuffix ".test"
+        }
+
+        oo_prod_ {
+            ...
+            // applicationIdSuffix ".pro" // 生产环境不设置，删掉该行即可
+        }
+
+    }
+```
+
+安装后效果如下：
+<img src="./imgs/more_apk.png" />
+
+
+
+
 
 
 
